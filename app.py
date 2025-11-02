@@ -6,7 +6,7 @@ import cv2
 import os
 
 app = Flask(__name__)
-emotion_detector = EmotionDetector()  # Load once into memory
+emotion_detector = EmotionDetector()
 
 @app.route('/')
 def index():
@@ -18,12 +18,12 @@ def detect_emotion():
         return jsonify({'error': 'No image uploaded'}), 400
 
     file = request.files['image']
-    # Decode image bytes into OpenCV frame
     frame = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
     emotion = emotion_detector.predict(frame)
     return jsonify({'emotion': emotion})
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    # Waitress = lightweight WSGI server for production
+    # 👇 Render provides PORT in the environment — must use it exactly
+    port = int(os.environ.get('PORT', 10000))
+    print(f"✅ Starting server on port {port}...")
     serve(app, host='0.0.0.0', port=port)
