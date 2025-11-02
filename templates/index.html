@@ -335,6 +335,13 @@
 
         function retake() {
             document.getElementById('preview-area').style.display = 'none';
+            // clear preview image and captured data so user starts fresh
+            capturedImage = null;
+            const previewImg = document.getElementById('preview-image');
+            if (previewImg) previewImg.src = '';
+            // reset file input so same file can be chosen again
+            const fileInput = document.getElementById('image-upload');
+            if (fileInput) fileInput.value = '';
             if (currentMethod === 'upload') {
                 document.getElementById('upload-area').style.display = 'flex';
             } else {
@@ -360,7 +367,28 @@
             displayResults(data);
         }
 
+        // Remove prior result DOM nodes and reset UI pieces so "Try Again" starts fresh
+        function clearPreviousResults() {
+            // remove appended all-emotions blocks
+            document.querySelectorAll('.all-emotions').forEach(n => n.remove());
+            // clear recommendations and questions
+            const recList = document.getElementById('recommendations-list');
+            if (recList) recList.innerHTML = '';
+            const qList = document.getElementById('questions-list');
+            if (qList) qList.innerHTML = '';
+            // reset emotion badge
+            const emotionLabel = document.getElementById('emotion-label');
+            const confidenceValue = document.getElementById('confidence-value');
+            if (emotionLabel) emotionLabel.textContent = '';
+            if (confidenceValue) confidenceValue.textContent = '';
+            // clear message box
+            const msg = document.getElementById('emotion-message');
+            if (msg) msg.textContent = '';
+        }
+
         function displayResults(data) {
+            // clear any previous results to avoid duplicates when user clicks Try Again
+            clearPreviousResults();
             document.getElementById('results-name').textContent = data.name;
             document.getElementById('emotion-label').textContent = data.emotion;
             document.getElementById('confidence-value').textContent = 
@@ -433,7 +461,18 @@
         }
 
         function analyzeAgain() {
-            // Keep the same method (upload/live) and go directly to detection screen
+            // Reset UI state and keep the same method (upload/live)
+            clearPreviousResults();
+            capturedImage = null;
+            // hide results and analyzing UI
+            document.getElementById('preview-area').style.display = 'none';
+            document.getElementById('analyzing').style.display = 'none';
+            // reset preview image and file input
+            const previewImg = document.getElementById('preview-image');
+            if (previewImg) previewImg.src = '';
+            const fileInput = document.getElementById('image-upload');
+            if (fileInput) fileInput.value = '';
+
             showScreen('detection-screen');
             if (currentMethod === 'upload') {
                 document.getElementById('upload-area').style.display = 'flex';
@@ -443,8 +482,6 @@
                 document.getElementById('camera-area').style.display = 'flex';
                 startCamera();
             }
-            document.getElementById('preview-area').style.display = 'none';
-            document.getElementById('analyzing').style.display = 'none';
         }
 
         async function logout() {

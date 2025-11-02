@@ -252,8 +252,8 @@ body {
 }
 
 .mirror-ring {
-    width: 500px;
-    height: 500px;
+    width: 560px;
+    height: 560px;
     border-radius: 50%;
     background: linear-gradient(135deg, rgba(192, 192, 192, 0.2) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(160, 160, 160, 0.2) 100%);
     border: 8px solid rgba(192, 192, 192, 0.4);
@@ -776,8 +776,8 @@ body {
     .mirror-ring {
         width: 90vw;
         height: 90vw;
-        max-width: 500px;
-        max-height: 500px;
+        max-width: 560px;
+        max-height: 560px;
     }
     
     .method-buttons {
