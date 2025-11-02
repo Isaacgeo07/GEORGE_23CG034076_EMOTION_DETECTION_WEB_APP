@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Ring - Emotion Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Animated Gems Background -->
+    <div class="gems-container">
+        <div class="gem gem-1"></div>
+        <div class="gem gem-2"></div>
+        <div class="gem gem-3"></div>
+        <div class="gem gem-4"></div>
+        <div class="gem gem-5"></div>
+        <div class="gem gem-6"></div>
+        <div class="gem gem-7"></div>
+        <div class="gem gem-8"></div>
+    </div>
+
+    <!-- Login/Signup Screen -->
+    <div id="auth-screen" class="screen active">
+        <div class="auth-container">
+            <h1 class="mood-ring-title-auth">Mood Ring</h1>
+            <p class="auth-subtitle">Discover your emotional aura</p>
+            
+            <div id="login-form" class="auth-form">
+                <h2>Sign In</h2>
+                <input type="text" id="login-username" placeholder="Username" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button onclick="login()">Sign In</button>
+                <p class="auth-switch">Don't have an account? <a href="#" onclick="showSignup()">Sign up</a></p>
+            </div>
+            
+            <div id="signup-form" class="auth-form" style="display: none;">
+                <h2>Create Account</h2>
+                <input type="text" id="signup-username" placeholder="Username" required>
+                <input type="password" id="signup-password" placeholder="Password" required>
+                <input type="password" id="signup-confirm" placeholder="Confirm Password" required>
+                <button onclick="signup()">Sign Up</button>
+                <p class="auth-switch">Already have an account? <a href="#" onclick="showLogin()">Sign in</a></p>
+            </div>
+            
+            <div id="auth-message" class="auth-message"></div>
+        </div>
+    </div>
+
+    <!-- Name Input Screen -->
+    <div id="name-screen" class="screen">
+        <div class="content-container">
+            <h1 class="mood-ring-title">Mood Ring</h1>
+            <div class="ring-container">
+                <div class="mirror-ring">
+                    <div class="ring-content">
+                        <p class="intro-text">Welcome! Before we begin, please tell us your name</p>
+                        <input type="text" id="user-name" placeholder="Enter your name" class="name-input">
+                        <button onclick="saveName()" class="primary-btn">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detection Method Selection -->
+    <div id="method-screen" class="screen">
+        <div class="content-container">
+            <h1 class="mood-ring-title">Mood Ring</h1>
+            <div class="ring-container">
+                <div class="mirror-ring">
+                    <div class="ring-content">
+                        <h2 class="welcome-message">Hello, <span id="user-name-display"></span>!</h2>
+                        <p class="instruction-text">Choose how you'd like to capture your emotion</p>
+                        <div class="method-buttons">
+                            <button onclick="selectMethod('upload')" class="method-btn">
+                                <span class="btn-icon">📸</span>
+                                Upload Image
+                            </button>
+                            <button onclick="selectMethod('live')" class="method-btn">
+                                <span class="btn-icon">🎥</span>
+                                Live Capture
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detection Screen -->
+    <div id="detection-screen" class="screen">
+        <div class="content-container">
+            <h1 class="mood-ring-title fade-out">Mood Ring</h1>
+            <div class="ring-container">
+                <div class="mirror-ring">
+                    <div id="upload-area" style="display: none;">
+                        <input type="file" id="image-upload" accept="image/*" onchange="handleImageUpload(event)">
+                        <label for="image-upload" class="upload-label">
+                            <span class="upload-icon">📷</span>
+                            <p>Click to upload or drag image here</p>
+                        </label>
+                    </div>
+                    
+                    <div id="camera-area" style="display: none;">
+                        <video id="video" autoplay playsinline></video>
+                        <canvas id="canvas" style="display: none;"></canvas>
+                        <button onclick="captureImage()" class="capture-btn">Capture</button>
+                    </div>
+                    
+                    <div id="preview-area" style="display: none;">
+                        <img id="preview-image" alt="Preview">
+                        <div class="preview-buttons">
+                            <button onclick="analyzeEmotion()" class="analyze-btn">Analyze Emotion</button>
+                            <button onclick="retake()" class="retake-btn">Retake</button>
+                        </div>
+                    </div>
+                    
+                    <div id="analyzing" style="display: none;">
+                        <div class="analyzing-animation">
+                            <div class="pulse-ring"></div>
+                            <p>Analyzing your emotional aura...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="screen">
+        <div class="content-container">
+            <div class="results-container">
+                <h1 class="results-title"><span id="results-name"></span>, here's what we discovered</h1>
+                
+                <div class="emotion-result">
+                    <div class="emotion-badge">
+                        <h2 id="emotion-label">Happy</h2>
+                        <p class="confidence">Confidence: <span id="confidence-value">95%</span></p>
+                    </div>
+                </div>
+                
+                <div class="message-box">
+                    <p id="emotion-message"></p>
+                </div>
+                
+                <div class="recommendations-section">
+                    <h3>💎 Recommendations for You</h3>
+                    <ul id="recommendations-list"></ul>
+                </div>
+                
+                <div class="questions-section">
+                    <h3>✨ Reflective Questions</h3>
+                    <ul id="questions-list"></ul>
+                </div>
+                
+                <div class="action-buttons">
+                    <button onclick="analyzeAgain()" class="secondary-btn">Try Again with Same Method</button>
+                    <button onclick="showScreen('method-screen')" class="secondary-btn">Choose Different Method</button>
+                    <button onclick="logout()" class="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 'auth-screen';
+        let currentMethod = '';
+        let capturedImage = null;
+        let stream = null;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            currentScreen = screenId;
+        }
+
+        function showLogin() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('signup-form').style.display = 'none';
+            document.getElementById('auth-message').textContent = '';
+        }
+
+        function showSignup() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'block';
+            document.getElementById('auth-message').textContent = '';
+        }
+
+        async function login() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                showMessage('Please enter both username and password', 'error');
+                return;
+            }
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                showScreen('name-screen');
+            } else {
+                showMessage(data.message || 'Invalid credentials', 'error');
+            }
+        }
+
+        async function signup() {
+            const username = document.getElementById('signup-username').value;
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            if (!username || !password || !confirm) {
+                showMessage('Please fill all fields', 'error');
+                return;
+            }
+
+            if (password !== confirm) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+
+            const response = await fetch('/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                showScreen('name-screen');
+            } else {
+                showMessage(data.message || 'Signup failed', 'error');
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('auth-message');
+            messageEl.textContent = message;
+            messageEl.className = `auth-message ${type}`;
+        }
+
+        async function saveName() {
+            const name = document.getElementById('user-name').value.trim();
+            
+            if (!name) {
+                alert('Please enter your name');
+                return;
+            }
+
+            await fetch('/save_name', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            });
+
+            document.getElementById('user-name-display').textContent = name;
+            showScreen('method-screen');
+        }
+
+        function selectMethod(method) {
+            currentMethod = method;
+            showScreen('detection-screen');
+            
+            document.querySelector('.mood-ring-title').classList.add('fade-out');
+            
+            if (method === 'upload') {
+                document.getElementById('upload-area').style.display = 'flex';
+                document.getElementById('camera-area').style.display = 'none';
+            } else {
+                document.getElementById('upload-area').style.display = 'none';
+                document.getElementById('camera-area').style.display = 'flex';
+                startCamera();
+            }
+        }
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user' } 
+                });
+                document.getElementById('video').srcObject = stream;
+            } catch (error) {
+                alert('Could not access camera. Please upload an image instead.');
+                showScreen('method-screen');
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    capturedImage = e.target.result;
+                    showPreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function captureImage() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            
+            capturedImage = canvas.toDataURL('image/jpeg');
+            stopCamera();
+            showPreview();
+        }
+
+        function showPreview() {
+            document.getElementById('upload-area').style.display = 'none';
+            document.getElementById('camera-area').style.display = 'none';
+            document.getElementById('preview-area').style.display = 'flex';
+            document.getElementById('preview-image').src = capturedImage;
+        }
+
+        function retake() {
+            document.getElementById('preview-area').style.display = 'none';
+            if (currentMethod === 'upload') {
+                document.getElementById('upload-area').style.display = 'flex';
+            } else {
+                document.getElementById('camera-area').style.display = 'flex';
+                startCamera();
+            }
+        }
+
+        async function analyzeEmotion() {
+            document.getElementById('preview-area').style.display = 'none';
+            document.getElementById('analyzing').style.display = 'flex';
+
+            const response = await fetch('/detect_emotion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    image: capturedImage,
+                    type: currentMethod
+                })
+            });
+
+            const data = await response.json();
+            displayResults(data);
+        }
+
+        function displayResults(data) {
+            document.getElementById('results-name').textContent = data.name;
+            document.getElementById('emotion-label').textContent = data.emotion;
+            document.getElementById('confidence-value').textContent = 
+                Math.round(data.confidence * 100) + '%';
+            document.getElementById('emotion-message').textContent = 
+                data.recommendations.message;
+
+            // Display all detected emotions
+            const emotionsList = document.createElement('div');
+            emotionsList.className = 'all-emotions';
+            emotionsList.innerHTML = '<h3>📊 All Detected Emotions</h3>';
+            const emotionsChart = document.createElement('div');
+            emotionsChart.className = 'emotions-chart';
+            
+            Object.entries(data.all_emotions).forEach(([emotion, confidence]) => {
+                const emotionBar = document.createElement('div');
+                emotionBar.className = 'emotion-bar';
+                emotionBar.innerHTML = `
+                    <div class="emotion-name">${emotion.charAt(0).toUpperCase() + emotion.slice(1)}</div>
+                    <div class="emotion-bar-container">
+                        <div class="emotion-bar-fill" style="width: ${confidence * 100}%"></div>
+                    </div>
+                    <div class="emotion-percentage">${Math.round(confidence * 100)}%</div>
+                `;
+                emotionsChart.appendChild(emotionBar);
+            });
+            emotionsList.appendChild(emotionsChart);
+            document.querySelector('.emotion-result').appendChild(emotionsList);
+
+            // Primary recommendations
+            const recList = document.getElementById('recommendations-list');
+            recList.innerHTML = '<h4>Primary Emotion Recommendations:</h4>';
+            data.recommendations.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                recList.appendChild(li);
+            });
+
+            // Secondary emotions recommendations
+            if (data.secondary_recommendations && data.secondary_recommendations.length > 0) {
+                const secRecList = document.createElement('div');
+                secRecList.className = 'secondary-recommendations';
+                secRecList.innerHTML = '<h4>Additional Insights:</h4>';
+                
+                data.secondary_recommendations.forEach(secEmotion => {
+                    const secDiv = document.createElement('div');
+                    secDiv.className = 'secondary-emotion';
+                    secDiv.innerHTML = `
+                        <h5>${secEmotion.emotion} (${Math.round(secEmotion.confidence * 100)}%)</h5>
+                        <p>${secEmotion.message}</p>
+                        <ul>
+                            ${secEmotion.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    `;
+                    secRecList.appendChild(secDiv);
+                });
+                recList.appendChild(secRecList);
+            }
+
+            // Questions for reflection
+            const qList = document.getElementById('questions-list');
+            qList.innerHTML = '';
+            data.recommendations.questions.forEach(q => {
+                const li = document.createElement('li');
+                li.textContent = q;
+                qList.appendChild(li);
+            });
+
+            showScreen('results-screen');
+        }
+
+        function analyzeAgain() {
+            // Keep the same method (upload/live) and go directly to detection screen
+            showScreen('detection-screen');
+            if (currentMethod === 'upload') {
+                document.getElementById('upload-area').style.display = 'flex';
+                document.getElementById('camera-area').style.display = 'none';
+            } else {
+                document.getElementById('upload-area').style.display = 'none';
+                document.getElementById('camera-area').style.display = 'flex';
+                startCamera();
+            }
+            document.getElementById('preview-area').style.display = 'none';
+            document.getElementById('analyzing').style.display = 'none';
+        }
+
+        async function logout() {
+            window.location.href = '/logout';
+        }
+
+        // Handle file drop
+        const uploadArea = document.getElementById('upload-area');
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        capturedImage = event.target.result;
+                        showPreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

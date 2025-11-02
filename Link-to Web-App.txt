@@ -1,0 +1,53 @@
+Hosting Platform Options for Mood Ring Web App
+=====================================================
+
+Option 1: Render
+https://render.com
+- Free tier available
+- Automatic deployments from GitHub
+- Supports Python/Flask applications
+- Link format: https://mood-ring-[your-app-name].onrender.com
+
+Option 2: PythonAnywhere
+https://www.pythonanywhere.com
+- Free tier available (with limitations)
+- Easy Flask deployment
+- Link format: https://[your-username].pythonanywhere.com
+
+Option 3: Railway
+https://railway.app
+- Free trial available
+- GitHub integration
+- Link format: https://mood-ring-production.up.railway.app
+
+Option 4: Heroku
+https://www.heroku.com
+- Paid plans (free tier discontinued)
+- Reliable hosting
+- Link format: https://mood-ring-app.herokuapp.com
+
+Option 5: Google Cloud Platform (GCP)
+https://cloud.google.com
+- Free tier available
+- Scalable infrastructure
+- Link format: https://mood-ring-[project-id].uc.r.appspot.com
+
+Deployment Instructions:
+========================
+
+For Render:
+1. Push your code to GitHub
+2. Connect your GitHub repository to Render
+3. Set build command: pip install -r requirements.txt
+4. Set start command: gunicorn app:app
+5. Add environment variable: EMOTION_MODEL_URL
+
+For PythonAnywhere:
+1. Upload your files via the Files tab
+2. Set up a virtual environment
+3. Install requirements: pip install -r requirements.txt
+4. Configure WSGI file to point to your Flask app
+5. Reload your web app
+
+Note: The actual link will be generated after you deploy the application.
+Replace [your-app-name] or [your-username] with your chosen values.
